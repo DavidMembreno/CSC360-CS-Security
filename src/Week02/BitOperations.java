@@ -18,7 +18,7 @@ public class BitOperations
     }
     public static byte sixbits(byte _byte)
     {
-        _byte = (byte)((_byte >>> 2) & 0b00111111);;
+        _byte = (byte)((_byte >>> 2) & 0b00111111);
         return _byte;
     }
     public static short lrswap(short _in)
