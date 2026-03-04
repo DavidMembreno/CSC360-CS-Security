@@ -1,4 +1,4 @@
-package Week01;
+package Diceware;
 
 import java.io.File;
 import java.io.FileNotFoundException;

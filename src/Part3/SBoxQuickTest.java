@@ -1,6 +1,6 @@
-package Week03;
+package Part3;
 
-import static Week03.BinaryTools.int2binary;
+import static Part3.BinaryTools.int2binary;
 
 public class SBoxQuickTest {
     public static void main(String[] args) {

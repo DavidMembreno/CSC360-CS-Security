@@ -1,8 +1,8 @@
-package Week03;
+package Part3;
 
-import static Week03.BinaryTools.int2binary;
-import static Week03.BitOperations.S1;
-import static Week03.BitOperations.S2;
+import static Part3.BinaryTools.int2binary;
+import static Part3.BitOperations.S1;
+import static Part3.BitOperations.S2;
 
 public class TestClass_03
 {

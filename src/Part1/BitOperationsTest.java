@@ -1,4 +1,4 @@
-package Week02;
+package Part1;
 
 public class BitOperationsTest {
 	

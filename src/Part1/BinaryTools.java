@@ -1,4 +1,4 @@
-package Week03;
+package Part1;
 
 public class BinaryTools
 {

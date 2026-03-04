@@ -1,6 +1,6 @@
-package Week03;
+package Part4;
 
-public class BitOperations
+public class BitOperationsIV
 {
     //2D Arrays for the tables
     private static final byte[][] S1_TABLE = {
@@ -50,6 +50,45 @@ public class BitOperations
         int row = (val >>> 3) & 1;
         int column = val & 0b111;
         return S2_TABLE[row][column];
+    }
+    public static byte expander(byte _byte)
+    {
+        int x = _byte & 0x3F;
+        int[] src = {0, 1, 3, 2, 3, 2, 4, 5}; // src[dst] = which input bit
+        int out = 0;
+
+        for (int dst = 0; dst < 8; dst++) {
+            out |= ((x >>> src[dst]) & 1) << dst;
+        }
+        return (byte) out;
+    }
+
+    public static byte keyextractor(short _key, int _pos)
+    {
+        int key = _key & 0xFFFF;
+        int pos = _pos & 0x0F;
+        int out = 0;
+
+        for (int i = 0; i < 8; i++) {
+            int logicalIndex = (pos + i) % 16;
+            int bitIndex = 15 - logicalIndex;
+            int bit = (key >>> bitIndex) & 1;
+
+            out |= bit << (7 - i);
+        }
+
+        return (byte) out;
+    }
+
+    public static byte feistel(byte R, byte K)
+    {
+
+        byte x = (byte)(expander(R) ^ K);
+
+        byte s1 = S1(left(x));
+        byte s2 = S2(right(x));
+
+        return (byte)(((s1 & 0x07) << 3) | (s2 & 0x07));
     }
 
 }
