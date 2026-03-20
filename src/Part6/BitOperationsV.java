@@ -1,6 +1,6 @@
-package Part5;
+package Part6;
 
-public class BitOperationsIV
+public class BitOperationsV
 {
     //2D Arrays for the tables
     private static final byte[][] S1_TABLE = {
@@ -90,6 +90,59 @@ public class BitOperationsIV
 
         return (byte)(((s1 & 0x07) << 3) | (s2 & 0x07));
     }
+
+    //2nd Newest
+    public static short[] preprocess(byte[] data)
+    {
+        int pad = (3 - (data.length % 3)) % 3;
+        byte[] padded = new byte[data.length + pad];
+
+        for (int i = 0; i < data.length; i++)
+        {
+            padded[i] = data[i];
+        }
+
+        int groups = padded.length / 3;
+        short[] out = new short[groups * 2];
+
+        int k = 0;
+        for (int i = 0; i < padded.length; i += 3)
+        {
+            int X = padded[i]     & 0xFF;
+            int Y = padded[i + 1] & 0xFF;
+            int Z = padded[i + 2] & 0xFF;
+
+            int s1 = ((X << 4) | (Y >>> 4)) & 0x0FFF;
+            int s2 = (((Y & 0x0F) << 8) | Z) & 0x0FFF;
+
+            out[k++] = (short)s1;
+            out[k++] = (short)s2;
+        }
+        return out;
+    }
+    public static byte[] postprocess(short[] s)
+    {
+        byte[] out = new byte[(s.length / 2) * 3];
+
+        int k = 0;
+        for (int i = 0; i < s.length; i += 2)
+        {
+            int s1 = s[i]     & 0x0FFF;
+            int s2 = s[i + 1] & 0x0FFF;
+
+
+            int X = (s1 >>> 4) & 0xFF;
+
+            int Y = ((s1 & 0x0F) << 4) | ((s2 >>> 8) & 0x0F);
+
+            int Z = s2 & 0xFF;
+
+            out[k++] = (byte)X;
+            out[k++] = (byte)Y;
+            out[k++] = (byte)Z;
+        }
+        return out;
+    }
     public static short encode12(short plain, int round, short key9)
     {
         byte key = keyextractor(key9, round);
@@ -128,59 +181,27 @@ public class BitOperationsIV
         return (short) ((combinedR << 6) | combinedL);
     }
     //Newest
-    public static short[] preprocess(String s)
+    public static byte[] encrypt(String plaintext, short key9)
     {
-        byte[] data = s.getBytes();
-        int pad = (3 - (data.length % 3)) % 3;
-        byte[] padded = new byte[data.length + pad];
+        short[] blocks = preprocess(plaintext.getBytes());
 
-        for (int i = 0; i < data.length; i++)
+        for (int i = 0; i < blocks.length; i++)
         {
-            padded[i] = data[i];
+            blocks[i] = encode12(blocks[i], 1, key9);
         }
 
-        int groups = padded.length / 3;
-        short[] out = new short[groups * 2];
-
-        int k = 0;
-        for (int i = 0; i < padded.length; i += 3)
-        {
-            int X = padded[i]     & 0xFF;
-            int Y = padded[i + 1] & 0xFF;
-            int Z = padded[i + 2] & 0xFF;
-
-            int s1 = ((X << 4) | (Y >>> 4)) & 0x0FFF;
-
-            int s2 = (((Y & 0x0F) << 8) | Z) & 0x0FFF;
-
-            out[k++] = (short)s1;
-            out[k++] = (short)s2;
-        }
-        return out;
-    }
-    public static byte[] postprocess(short[] s)
-    {
-        byte[] out = new byte[(s.length / 2) * 3];
-
-        int k = 0;
-        for (int i = 0; i < s.length; i += 2)
-        {
-            int s1 = s[i]     & 0x0FFF;
-            int s2 = s[i + 1] & 0x0FFF;
-
-
-            int X = (s1 >>> 4) & 0xFF;
-
-            int Y = ((s1 & 0x0F) << 4) | ((s2 >>> 8) & 0x0F);
-
-            int Z = s2 & 0xFF;
-
-            out[k++] = (byte)X;
-            out[k++] = (byte)Y;
-            out[k++] = (byte)Z;
-        }
-        return out;
+        return postprocess(blocks);
     }
 
+    public static String decrypt(byte[] ciphertext, short key9)
+    {
+        short[] blocks = preprocess(ciphertext);
 
+        for (int i = 0; i < blocks.length; i++)
+        {
+            blocks[i] = decode12(blocks[i], 1, key9);
+        }
+
+        return new String(postprocess(blocks));
+    }
 }
